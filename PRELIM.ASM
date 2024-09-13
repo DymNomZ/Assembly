@@ -1,7 +1,7 @@
 ;Filename: PRELIM.ASM
 ;CS243 Lab Prelim Exam First Semester SY 2024-2025
 ;Student Name: JOHN DYMIER O. BORGONIA
-;Date Finished: Date Today
+;Date Finished: September 13, 2024
 
 .model small
 
