@@ -30,7 +30,7 @@ ProgramStart:
     cmp entered_char,'a'                
     jz is_a          
 
-    cmp al,'A'              
+    cmp entered_char,'A'              
     jnz is_not_a           
 
 
