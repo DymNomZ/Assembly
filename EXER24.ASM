@@ -489,8 +489,18 @@ mov bl, 20h
 mov cx, 8                                
 int 10h
 
-    lea dx, whits2
-	mov ah, 09
+    LEA SI, per_type + 2     
+    MOV CL, [per_type + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, per_type + 2     
+    MOV AH, 09h               
+    INT 21h 
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
 	int 21h
 
 mov ah, 09h
@@ -526,8 +536,33 @@ mov bl, 20h
 mov cx, 8                                
 int 10h
 
-    lea dx, whits2
-	mov ah, 09
+    LEA SI, veh_stkr + 2     
+    MOV CL, [veh_stkr + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, veh_stkr + 2     
+    MOV AH, 09h               
+    INT 21h 
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
 	int 21h
 
 mov ah, 09h
@@ -617,13 +652,18 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 11                                
 int 10h
 
-    lea dx, whits3
-	mov ah, 09
-	int 21h
+    LEA SI, dvr_name + 2     
+    MOV CL, [dvr_name + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, dvr_name + 2     
+    MOV AH, 09h               
+    INT 21h 
 
 mov ah, 09h
 mov bl, 70h
@@ -645,12 +685,32 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 11                                
 int 10h
 
-    lea dx, whits3
-	mov ah, 09
+    LEA SI, id_num + 2     
+    MOV CL, [id_num + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, id_num + 2     
+    MOV AH, 09h               
+    INT 21h 
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
 	int 21h
 
 mov ah, 09h
@@ -731,13 +791,18 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 11                                
 int 10h
 
-    lea dx, whits3
-	mov ah, 09
-	int 21h
+    LEA SI, mob_num + 2     
+    MOV CL, [mob_num + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, mob_num + 2     
+    MOV AH, 09h               
+    INT 21h 
 
 mov ah, 09h
 mov bl, 70h
@@ -759,13 +824,18 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 11                                
 int 10h
 
-    lea dx, whits3
-	mov ah, 09
-	int 21h
+    LEA SI, addrs + 2     
+    MOV CL, [addrs + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, addrs + 2     
+    MOV AH, 09h               
+    INT 21h 
 
 mov ah, 09h
 mov bl, 70h
@@ -845,13 +915,18 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 11                                
 int 10h
 
-    lea dx, whits3
-	mov ah, 09
-	int 21h
+    LEA SI, veh_mb + 2     
+    MOV CL, [veh_mb + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, veh_mb + 2     
+    MOV AH, 09h               
+    INT 21h 
 
 mov ah, 09h
 mov bl, 70h
@@ -873,13 +948,18 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 11                                
 int 10h
 
-    lea dx, whits3
-	mov ah, 09
-	int 21h
+    LEA SI, plate_num + 2     
+    MOV CL, [plate_num + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, plate_num + 2     
+    MOV AH, 09h               
+    INT 21h 
 
 mov ah, 09h
 mov bl, 70h
@@ -959,12 +1039,42 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 8                                
 int 10h
 
-    lea dx, whits2
-	mov ah, 09
+    LEA SI, veh_color + 2     
+    MOV CL, [veh_color + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, veh_color + 2     
+    MOV AH, 09h               
+    INT 21h 
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
+	int 21h
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
 	int 21h
 
 mov ah, 09h
@@ -996,12 +1106,22 @@ int 10h
 	int 21h
 
 mov ah, 09h
-mov bl, 0AAh
+mov bl, 20h
 mov cx, 8                                
 int 10h
 
-    lea dx, whits2
-	mov ah, 09
+    LEA SI, veh_type + 2     
+    MOV CL, [veh_type + 1]   
+    MOV CH, 0
+    ADD SI, CX                
+    MOV BYTE PTR [SI], '$'   
+    LEA DX, veh_type + 2     
+    MOV AH, 09h               
+    INT 21h 
+
+	mov ah, 02h
+	mov cl, 20h ; SPACE
+	mov dl, cl
 	int 21h
 
 mov ah, 09h
