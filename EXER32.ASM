@@ -1,11 +1,13 @@
 ;Filename: EXER32.ASM
-;CS243 Lab Hands-on Exam No. 2
 ;First Semester SY 2024-2025
 ;Student Name: JOHN DYMIER BORGONIA
 ;Date Finished: September 29, 2024
+;Description: Copy your code from the 2nd Lab Hands-on Exam. Edit your
+;code to perform the actual math operations and display the
+;results. 
 
 .model small
-.stack 100
+.stack 200h
 .data
     calc DB 'THE CALCULATOR ',13,10,'$'
     cret DB 'Created by: JOHN DYMIER O. BORGONIA',13,10,'$'
@@ -47,14 +49,15 @@
     invalid DB 'INVALID CHOICE!$'
     thanks DB 13,10,10,'Thank you.$'
 
-    choice DB ?
-    first DB ?
-    second DB ?
-    ans DB ?
+    choice DB 13,10,'$'
+    first DW ?
+    second DW ?
+    ans DW ?
+    neg_sign db '-$' 
 
-    h_first DW ?
-    h_second DW ?
-    quotient DW ?
+    h_first DB 20 DUP ('$')
+    h_second DB 20 DUP ('$')
+    h_ans DB 20 DUP ('$')
 
     display_sum DB 'Sum: $'
     display_diff DB 'Difference: $'
@@ -62,95 +65,67 @@
     display_quo DB 'Quotient: $'
 
 .CODE
-program_start:
-    mov ax,@data
-    mov ds,ax                   
 
-    mov dx,OFFSET calc    
-    mov ah,9                   
-    int 21h    
+int_to_ascii:
+    push ax
+    push bx
+    push cx
+    push dx
 
-    mov dx,OFFSET cret    
-    mov ah,9                   
-    int 21h 
+    mov cx, 0 
+    mov bx, 10 
 
-    mov dx,OFFSET date    
-    mov ah,9                   
-    int 21h    
+loop1:
+    xor dx, dx
+    div bx 
+    push dx 
+    inc cx 
+    cmp ax, 0 
+    jne loop1
 
-    mov dx,OFFSET menu    
-    mov ah,9                   
-    int 21h 
-
-mov ah, 09h
-mov bl, 60h
-mov cx, 12                                
-int 10h
-
-    mov dx,OFFSET a    
-    mov ah,9                   
-    int 21h 
-
-mov ah, 09h
-mov bl, 20h
-mov cx, 15                               
-int 10h
-
-    mov dx,OFFSET s    
-    mov ah,9                   
-    int 21h 
-
-mov ah, 09h
-mov bl, 30h
-mov cx, 18                                
-int 10h
-
-    mov dx,OFFSET m    
-    mov ah,9                   
-    int 21h 
-
-mov ah, 09h
-mov bl, 50h
-mov cx, 12                                
-int 10h
-
-    mov dx,OFFSET d    
-    mov ah,9                   
-    int 21h    
-
-mov ah, 09h
-mov bl, 70h
-mov cx, 8                                
-int 10h  
-
-    mov dx,OFFSET eexit    
-    mov ah,9                   
-    int 21h    
-
-    mov dx,OFFSET enter_choice    
-    mov ah,9                   
-    int 21h       
-
-    mov ah,1                    
-    int 21h                     
-    mov choice,al
-
-    mov ah,02h
-    mov cl,0Ah ; NL
-    mov dl,cl
+loop2:
+    pop dx 
+    add dl, '0' 
+    mov ah, 02h 
     int 21h
+    dec cx 
+    cmp cx, 0 
+    jne loop2
 
-    mov ah,02h
-    mov cl,0Ah ; NL
-    mov dl,cl
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+
+clear_screen:
+    mov ah, 00h
+    mov al, 03h
+    int 10h      
+    ret
+
+print_string:
+    mov ah, 09h
+    mov bl, 07h
     int 21h
+    ret
 
-    jmp cont0
+newline:
+    mov dx, OFFSET choice
+    CALL print_string
+    RET
 
-cont0:
-    cmp choice,'a'                
-    je perf_addition
-    jmp cont
+get_char:
+    mov ah,01h
+    int 21h
+    ret
+
+get_num:
+    mov ah, 01h
+    int 21h
+    sub al, '0'
+    mov ah, 0
+    ret
 
 perf_addition:
 mov ah, 09h
@@ -159,17 +134,13 @@ mov cx, 8
 int 10h  
 
     mov dx,OFFSET addition    
-    mov ah,9                   
-    int 21h     
+    CALL print_string  
 
     mov dx,OFFSET input_f_addend    
-    mov ah,9                   
-    int 21h     
+    CALL print_string
 
-    mov ah,1                    
-    int 21h    
-    SUB AL, '0'               
-    mov first,al   
+    CALL get_num             
+    mov first,ax  
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -177,26 +148,27 @@ int 10h
     int 21h
 
     mov dx,OFFSET input_s_addend    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    mov ah,1                    
-    int 21h        
-    SUB AL, '0'          
-    mov second,al
+    CALL get_num       
+    mov second,ax
 
     mov ah,02h
     mov cl,0Ah ; NL
     mov dl,cl
     int 21h
 
-    mov dx,OFFSET f_addend    
-    mov ah,9                   
-    int 21h 
+    mov dx, first
+    add dx, second
+    mov ans, dx
 
-    mov dl, first   
-    mov ah,02h    
-    ADD DL, '0'      
+    mov dx,OFFSET f_addend    
+    CALL print_string
+
+    mov ax, first
+    CALL int_to_ascii
+    mov dx, OFFSET h_first
+    mov ah, 9
     int 21h
 
     mov ah,02h
@@ -205,17 +177,13 @@ int 10h
     int 21h
 
     mov dx,OFFSET s_addend    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    mov dl, second   
-    mov ah,02h         
-    ADD DL, '0'
+    mov ax, second
+    CALL int_to_ascii
+    mov dx, OFFSET h_second
+    mov ah, 9
     int 21h
-
-    MOV AL, first
-    ADD AL, second
-    MOV ans, AL
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -223,20 +191,21 @@ int 10h
     int 21h
 
     mov dx,OFFSET display_sum    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    MOV AH, 02H
-    MOV DL, ans
-    ADD DL, '0' ; Convert numeric to ASCII
-    INT 21H
+    mov ax, ans
+    CALL int_to_ascii
+    mov dx, OFFSET h_ans
+    mov ah, 9
+    int 21h
+
+    mov dx, OFFSET press_enter
+    CALL print_string
+
+    CALL get_char
+    CALL clear_screen
     
-    jmp end_program
-
-cont:
-    cmp choice,'s'
-    je perf_subtraction
-    jmp cont2
+    jmp loop_start
 
 perf_subtraction:
 mov ah, 09h
@@ -245,17 +214,13 @@ mov cx, 11
 int 10h  
 
     mov dx,OFFSET subtraction    
-    mov ah,9                   
-    int 21h  
+    CALL print_string
 
     mov dx,OFFSET input_minuend    
-    mov ah,9                   
-    int 21h     
+    CALL print_string 
 
-    mov ah,1                    
-    int 21h      
-    SUB AL, '0'              
-    mov first,al   
+    CALL get_num           
+    mov first,ax  
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -263,26 +228,27 @@ int 10h
     int 21h
 
     mov dx,OFFSET input_subtrahend    
-    mov ah,9                   
-    int 21h     
+    CALL print_string   
 
-    mov ah,1                    
-    int 21h     
-    SUB AL, '0'              
-    mov second,al   
+    CALL get_num             
+    mov second,ax  
 
     mov ah,02h
     mov cl,0Ah ; NL
     mov dl,cl
     int 21h
 
-    mov dx,OFFSET minuend    
-    mov ah,9                   
-    int 21h 
+    mov dx, first
+    sub dx, second
+    mov ans, dx
 
-    mov dl, first   
-    mov ah,02h     
-    ADD DL, '0' 
+    mov dx,OFFSET minuend    
+    CALL print_string 
+
+    mov ax, first 
+    call int_to_ascii
+    mov dx, offset h_first
+    mov ah, 9
     int 21h
 
     mov ah,02h
@@ -291,17 +257,13 @@ int 10h
     int 21h
 
     mov dx,OFFSET subtrahend    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    mov dl, second   
-    mov ah,02h     
-    ADD DL, '0'   
+    mov ax, second 
+    call int_to_ascii
+    mov dx, offset h_second
+    mov ah, 9
     int 21h
-
-    MOV AL, first
-    SUB AL, second
-    MOV ans, AL
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -312,17 +274,30 @@ int 10h
     mov ah,9                   
     int 21h 
 
-    MOV AH, 02H
-    MOV DL, ans
-    ADD DL, '0' ; Convert numeric to ASCII
-    INT 21H
-    
-    jmp end_program
+    mov ax, ans
+    cmp ax, 0
+    jge display_diff_normal
 
-cont2:
-    cmp choice,'m'                
-    je perf_multiplication
-    jmp cont3
+    neg ax
+    mov ans, ax
+
+    mov dx, OFFSET neg_sign
+    CALL print_string
+
+display_diff_normal:
+    mov ax, ans 
+    call int_to_ascii
+    mov dx, offset h_ans
+    mov ah, 9
+    int 21h
+    
+    mov dx, OFFSET press_enter
+    CALL print_string
+
+    CALL get_char
+    CALL clear_screen
+    
+    jmp loop_start
 
 perf_multiplication:
 mov ah, 09h
@@ -331,17 +306,13 @@ mov cx, 14
 int 10h  
 
     mov dx,OFFSET multiplication    
-    mov ah,9                   
-    int 21h  
+    CALL print_string
 
     mov dx,OFFSET input_multiplicand    
-    mov ah,9                   
-    int 21h     
+    CALL print_string    
 
-    mov ah,1                    
-    int 21h      
-    SUB AL, '0'                
-    mov first,al   
+    CALL get_num             
+    mov first,ax 
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -349,26 +320,28 @@ int 10h
     int 21h
 
     mov dx,OFFSET input_multiplier    
-    mov ah,9                   
-    int 21h     
+    CALL print_string
 
-    mov ah,1                    
-    int 21h      
-    SUB AL, '0'            
-    mov second,al   
+    CALL get_num           
+    mov second,ax   
 
     mov ah,02h
     mov cl,0Ah ; NL
     mov dl,cl
     int 21h
 
-    mov dx,OFFSET multiplicand    
-    mov ah,9                   
-    int 21h 
+    mov ax, first
+    mov dx, second
+    mul dx
+    mov ans, ax
 
-    mov dl, first   
-    mov ah,02h    
-    ADD DL, '0'    
+    mov dx,OFFSET multiplicand    
+    CALL print_string
+
+    mov ax, first 
+    call int_to_ascii
+    mov dx, offset h_first
+    mov ah, 9
     int 21h
 
     mov ah,02h
@@ -377,18 +350,13 @@ int 10h
     int 21h
 
     mov dx,OFFSET multiplier    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    mov dl, second   
-    mov ah,02h    
-    ADD DL, '0'      
+    mov ax, second 
+    call int_to_ascii
+    mov dx, offset h_second
+    mov ah, 9
     int 21h
-
-    MOV DX, 0
-    MOV AL, first
-    MUL second
-    MOV ans, AL
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -396,39 +364,171 @@ int 10h
     int 21h
 
     mov dx,OFFSET display_prod    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    MOV AH, 02H
-    MOV DL, ans
-    ADD DL, '0' ; Convert numeric to ASCII
-    INT 21H
+    mov ax, ans 
+    call int_to_ascii
+    mov dx, offset h_ans
+    mov ah, 9
+    int 21h
     
-    jmp end_program
+    mov dx, OFFSET press_enter
+    CALL print_string
 
-cont3:
-    cmp choice,'d'
+    CALL get_char
+    CALL clear_screen
+    
+    jmp loop_start
+
+program_start:
+    mov ax,@data
+    mov ds,ax   
+
+loop_start:
+    CALL clear_screen
+
+    mov dx,OFFSET calc    
+    CALL print_string
+
+    mov dx,OFFSET cret  
+    CALL print_string  
+
+    mov dx,OFFSET date 
+    CALL print_string   
+
+    mov dx,OFFSET menu 
+    CALL print_string   
+
+mov ah, 09h
+mov bl, 60h
+mov cx, 12                                
+int 10h
+
+    mov dx,OFFSET a    
+    CALL print_string 
+
+mov ah, 09h
+mov bl, 20h
+mov cx, 15                               
+int 10h
+
+    mov dx,OFFSET s    
+    CALL print_string 
+
+mov ah, 09h
+mov bl, 30h
+mov cx, 18                                
+int 10h
+
+    mov dx,OFFSET m    
+    CALL print_string 
+
+mov ah, 09h
+mov bl, 50h
+mov cx, 12                                
+int 10h
+
+    mov dx,OFFSET d    
+    CALL print_string 
+
+mov ah, 09h
+mov bl, 70h
+mov cx, 8                                
+int 10h  
+
+    mov dx,OFFSET eexit    
+    CALL print_string  
+
+    mov dx,OFFSET enter_choice    
+    CALL print_string      
+
+    ; input choice
+    CALL get_char
+
+    ; choice paths
+    cmp al,'a'  
+    je a_a 
+    cmp al,'s' 
+    je s_s 
+    cmp al,'m' 
+    je m_m 
+    cmp al,'d' 
     je perf_division
-    jmp cont4
+    cmp al,'e' 
+    je perf_exit
+    jne invalid_choice
+
+invalid_choice:
+    CALL newline
+    CALL newline
+
+mov ah, 09h
+mov bl, 0CEh
+mov cx, 15                                
+int 10h  
+
+    mov dx,OFFSET invalid    
+    CALL print_string
+
+    mov dx, OFFSET press_enter
+    CALL print_string
+
+    CALL get_char
+    CALL clear_screen
+    
+    jmp loop_start 
+
+perf_exit:
+    CALL newline
+    CALL newline
+
+mov ah, 09h
+mov bl, 70h
+mov cx, 12                               
+int 10h  
+
+    mov dx,OFFSET exit_prog    
+    CALL print_string
+
+    mov dx, OFFSET press_enter
+    CALL print_string
+
+    CALL get_char
+    
+    jmp endend
+
+a_a:
+    CALL newline
+    CALL newline
+    jmp perf_addition
+
+s_s:
+    CALL newline
+    CALL newline
+    jmp perf_subtraction
+
+m_m:
+    CALL newline
+    CALL newline
+    jmp perf_multiplication
 
 perf_division:
+    CALL newline
+    CALL newline
+
 mov ah, 09h
 mov bl, 50h
 mov cx, 8                                
 int 10h  
 
     mov dx,OFFSET division    
-    mov ah,9                   
-    int 21h  
+    CALL print_string
 
     mov dx,OFFSET input_dividend    
-    mov ah,9                   
-    int 21h     
+    CALL print_string    
 
-    mov ah,1                    
-    int 21h    
-    SUB AX, '0'                   
-    mov h_first,AX
+    CALL get_num               
+    mov first,AX
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -436,26 +536,29 @@ int 10h
     int 21h
 
     mov dx,OFFSET input_divisor    
-    mov ah,9                   
-    int 21h     
+    CALL print_string   
 
-    mov ah,1                    
-    int 21h     
-    SUB AX, '0'                  
-    mov h_second,AX 
+    CALL get_num                 
+    mov second,AX 
 
     mov ah,02h
     mov cl,0Ah ; NL
     mov dl,cl
     int 21h
 
-    mov dx,OFFSET dividend    
-    mov ah,9                   
-    int 21h 
+    mov ax, first
+    xor dx, dx
+    mov bx, second
+    div bx
+    mov ans, ax
 
-    mov DX, h_first   
-    mov ah,02h    
-    ADD DX, '0'        
+    mov dx,OFFSET dividend    
+    CALL print_string
+
+    mov ax, second 
+    call int_to_ascii
+    mov dx, offset h_second
+    mov ah, 9
     int 21h
 
     mov ah,02h
@@ -464,18 +567,13 @@ int 10h
     int 21h
 
     mov dx,OFFSET divisor    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    mov DX, h_second   
-    mov ah,02h   
-    ADD DX, '0'         
+    mov ax, second 
+    call int_to_ascii
+    mov dx, offset h_second
+    mov ah, 9
     int 21h
-
-    MOV DX, 0
-    MOV AX, h_first
-    DIV h_second
-    MOV quotient, AX
 
     mov ah,02h
     mov cl,0Ah ; NL
@@ -483,69 +581,21 @@ int 10h
     int 21h
 
     mov dx,OFFSET display_quo    
-    mov ah,9                   
-    int 21h 
+    CALL print_string
 
-    MOV AH, 02H
-    MOV DX, quotient
-    ADD DX, '0' ; Convert numeric to ASCII
-    INT 21H
+    mov ax, ans 
+    call int_to_ascii
+    mov dx, offset h_ans
+    mov ah, 9
+    int 21h
     
-    jmp end_program
+    mov dx, OFFSET press_enter
+    CALL print_string
 
-cont4:
-    cmp choice,'e'                
-    je perf_exit 
-    jnz invalid_choice
-
-invalid_choice:
-mov ah, 09h
-mov bl, 0CEh
-mov cx, 15                                
-int 10h  
-
-    mov dx,OFFSET invalid    
-    mov ah,9                   
-    int 21h  
-
-    jmp end_program   
-
-perf_exit:
-mov ah, 09h
-mov bl, 70h
-mov cx, 12                               
-int 10h  
-
-    mov dx,OFFSET exit_prog    
-    mov ah,9                   
-    int 21h  
-
-    mov dx,OFFSET press_enter    
-    mov ah,9                   
-    int 21h  
-
-    mov ah,1                    
-    int 21H
-
-    jmp endend
-
-end_program:
-
-    mov dx,OFFSET press_enter    
-    mov ah,9                   
-    int 21h  
-
-    mov ah,1                    
-    int 21H
-
-    ; clears screen
-    mov ah, 06h
-    mov al, 0 
-    mov cx,0
-    mov dh,25
-    int 10h
-
-    jmp program_start
+    CALL get_char
+    CALL clear_screen
+    
+    jmp loop_start
 
 endend:
 

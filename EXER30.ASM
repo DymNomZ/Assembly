@@ -1,4 +1,4 @@
-;Filename: EXAM30.ASM
+;Filename: EXER30.ASM
 ;First Semester SY 2024-2025
 ;Student Name: JOHN DYMIER BORGONIA
 ;Date: September 29, 2024
