@@ -1,0 +1,7 @@
+mov ax, 1112h
+int 10h
+nara diay para ang character pixel height kay 8 pixels ra
+
+1111h for 14 pixels
+
+16 ang default
