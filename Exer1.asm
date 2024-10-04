@@ -4,9 +4,60 @@
 ; Experiment: replace 41h with different ASCII numbers
 
 .model small
+.stack 100h
+
+.data
+
+	text1 db 'Filename: EXER1.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Displays all the letters of the alphabet$'
+	text4 db 'Date Created: August 30, 2024$'
+
 .code
-.stack 100
 start:
+	MOV AX, @data
+    MOV DS, AX
+
+	mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
 	mov ah,02h
 	mov cl,61h ; a

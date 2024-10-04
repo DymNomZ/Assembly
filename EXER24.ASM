@@ -8,6 +8,11 @@
 
 .data
 
+	text1 db 'Filename: EXER24.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Automated Teller Machine$'
+	text4 db 'Date Created: September 21, 2024$'
+
     cit_u DB 'Cebu Institute of Technology - University',13,10,'$'
     veh_frm DB 'VEHICLE STICKER APPLICATION FORM',13,10,10,'$'
     enter_prompt DB 'Please enter the needed information:',13,10,'$'
@@ -75,6 +80,47 @@ start:
 
 	mov ax, @data
 	mov ds, ax
+
+	mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h     
 
     LEA DX, cit_u
     MOV AH, 09h               

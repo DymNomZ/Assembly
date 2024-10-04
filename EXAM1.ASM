@@ -4,6 +4,11 @@
 
 .data
 
+	text1 db 'Filename: EXAM1.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Multiplication Table.$'
+	text4 db 'Date Created: September 6, 2024$'
+
 linedef db "______________________________________________________$"
 mtable  db "| MULTIPLICATION TABLE                               |$"
 created db "| Created by: JOHN DYMIER BORGONIA                   |$"
@@ -40,6 +45,47 @@ start:
 	mov ax, @data
 
 	mov ds, ax
+
+	mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h        
 
 
 	lea dx, linedef

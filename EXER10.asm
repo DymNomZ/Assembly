@@ -1,6 +1,11 @@
 .model small
 .stack 100
 .data
+	text1 db 'Filename: EXER10.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: College Enrollment Form$'
+	text4 db 'Date Created: September 6, 2024$'
+
     horiB   db "________________________________________________________________________ $"
     vertiB  db "|                                                                       |$"
     college db "|   College Enrollment Form:                                    CIT-U   |$"
@@ -68,14 +73,46 @@ start:
 
 	mov ds, ax
 
+	mov ah, 9
+	mov dx,offset text1
+	int 21h
 
-mov ah, 09h
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
-mov bl, 20h
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
 
-mov cx, 50                                
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
-int 10h
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
 
 	lea dx, horiB

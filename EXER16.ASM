@@ -17,6 +17,11 @@
 
 .DATA
 
+    text1 db 'Filename: EXER16.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Display good morning message or good afternoon message if it is past noon.$'
+	text4 db 'Date Created: September 20, 2024$'
+
     TimePrompt DB 'Is it after 12 noon (Y/N) ?$'
 
     GoodMorningMessage LABEL BYTE
@@ -34,6 +39,47 @@ ProgramStart:
     mov ax,@data
 
     mov ds,ax                   ; set DS to point to data segment
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
     mov dx,OFFSET TimePrompt    ; point to the time prompt
 

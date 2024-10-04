@@ -7,6 +7,11 @@
 .model small
 .stack 100
 .data
+    text1 db 'Filename: EXAM2.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Calculator.$'
+	text4 db 'Date Created: September 28, 2024$'
+
     calc DB 'THE CALCULATOR ',13,10,'$'
     cret DB 'Created by: JOHN DYMIER O. BORGONIA',13,10,'$'
     date DB 'Date: September 24, 2024',13,10,'$'
@@ -54,6 +59,47 @@
 program_start:
     mov ax,@data
     mov ds,ax                   
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h        
 
     mov dx,OFFSET calc    
     mov ah,9                   

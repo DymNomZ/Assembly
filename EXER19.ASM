@@ -8,6 +8,11 @@
 .STACK 200h
 
 .DATA
+    text1 db 'Filename: EXER19.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Get and display three characters in different lines.$'
+	text4 db 'Date Created: September 20, 2024$'
+
     first_char db ?
     second_char db ?
     third_char db ?
@@ -23,6 +28,47 @@
 Main:
     mov ax, @data
     mov ds, ax
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
     mov dx,offset first_input_msg
     mov ah,09h

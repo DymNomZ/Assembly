@@ -11,13 +11,60 @@
     .MODEL small
     .STACK 100h
     .DATA
+    text1 db 'Filename: EXER18.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Get string input and display reverse of string.$'
+	text4 db 'Date Created: September 20, 2024$'
+
 MAXIMUM_STRING_LENGTH   EQU     1000
 StringToReverse DB MAXIMUM_STRING_LENGTH DUP (?)
 ReverseString   DB MAXIMUM_STRING_LENGTH DUP (?)
     .CODE
 ProgramStart:
     mov ax,@data
-    mov dx,ax                   ;set DS to point to the data segment
+    mov ds,ax                   ;set DS to point to the data segment
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
     mov ah,3fh                      ;DOS read from handle function
     mov bx,0                        ;standard input handle
     mov cx,MAXIMUM_STRING_LENGTH    ;read up to maximum number of

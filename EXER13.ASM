@@ -11,6 +11,10 @@
 .STACK 200h
 
 .DATA
+    text1 db 'Filename: EXER13.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Display multiple string variables on separate lines$'
+	text4 db 'Date Created: September 20, 2024$'
 
 String1 DB 'Line1',0dh,0ah,'$'
 
@@ -30,6 +34,47 @@ ProgramStart:
     mov ax,@data
 
     mov ds,ax
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
     mov ah,9                ; DOS print string function
 

@@ -6,6 +6,11 @@
 .STACK 100h
 .DATA
 
+    text1 db 'Filename: EXER22.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Student Enrollment Form$'
+	text4 db 'Date Created: September 20, 2024$'
+
     cit_u DB 'Cebu Institute of Technology - University',13,10,'$'
     stud_frm DB 'STUDENT ENROLLMENT FORM',13,10,10,'$'
     enter_prompt DB 'Please enter the following information:',13,10,'$'
@@ -49,6 +54,47 @@
 MAIN PROC
     MOV AX, @DATA
     MOV DS, AX
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h        
 
     LEA DX, cit_u
     MOV AH, 09h               

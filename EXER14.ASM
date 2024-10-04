@@ -14,6 +14,10 @@
 .STACK 200h
 
 .DATA
+    text1 db 'Filename: EXER14.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Get character input and display back character input.$'
+	text4 db 'Date Created: September 20, 2024$'
 
     inputChar db ?      ; variable to store the input character
 
@@ -30,6 +34,47 @@ Main:
     mov ax, @data
 
     mov ds, ax
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
 
     ; display the input prompt message
@@ -48,6 +93,11 @@ Main:
     int 21h             ; call DOS interrupt
 
     mov inputChar,al    ; store the character in inputChar
+
+    mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
 
 
     ; display the output message

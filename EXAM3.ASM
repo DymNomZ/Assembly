@@ -8,6 +8,11 @@
 .stack 100h
 .data
 
+    text1 db 'Filename: EXAM3.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Voter Registration Form.$'
+	text4 db 'Date Created: October 4, 2024$'
+
     voter_regis_form db "VOTER'S REGISTRATION FORM", 13,10, '$'
     created_by db 'Created by: JOHN DYMIER O. BORGONIA', 13, 10, '$'
     date db 'Date: OCTOBER 4, 2024', 13, 10, '$'
@@ -78,6 +83,47 @@
 main: 
     MOV AX, @data
     MOV DS, AX
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h        
     
 MOV AH, 09h
 MOV BL, 60h 
