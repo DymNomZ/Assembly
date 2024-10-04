@@ -5,3 +5,10 @@ nara diay para ang character pixel height kay 8 pixels ra
 1111h for 14 pixels
 
 16 ang default
+
+delay
+
+mov cx, 0FH
+mov dx, 4240H
+mov ah, 86H
+int 15h

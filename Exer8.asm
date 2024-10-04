@@ -19,8 +19,8 @@ main1:
 	mov dx,offset msg1
 	int 21h
 
-	mov ah, 20h
-	mov cl,20h
+	mov ah,02h
+	mov cl,0Ah ; NL
 	mov dl,cl
 	int 21h
 
@@ -33,13 +33,8 @@ main1:
 	mov dx,offset msg2
 	int 21h
 
-	mov ah, 20h
-	mov cl,20h
-	mov dl,cl
-	int 21h
-
-	mov ah, 20h
-	mov cl,0Ah
+	mov ah,02h
+	mov cl,0Ah ; NL
 	mov dl,cl
 	int 21h
 
@@ -47,13 +42,8 @@ main1:
 	mov dx,offset msg3
 	int 21h
 
-	mov ah, 20h
-	mov cl,20h
-	mov dl,cl
-	int 21h
-
-	mov ah, 20h
-	mov cl,0Ah
+	mov ah,02h
+	mov cl,0Ah ; NL
 	mov dl,cl
 	int 21h
 
@@ -61,13 +51,8 @@ main1:
 	mov dx,offset msg4
 	int 21h
 
-	mov ah, 20h
-	mov cl,20h
-	mov dl,cl
-	int 21h
-
-	mov ah, 20h
-	mov cl,0Ah
+	mov ah,02h
+	mov cl,0Ah ; NL
 	mov dl,cl
 	int 21h
 
