@@ -8,6 +8,11 @@
 .model small
 .stack 100
 .data
+    text1 db 'Filename: EXER27.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Input two integers, subtract, and display their difference$'
+	text4 db 'Date Created: September 29, 2024$'
+
     num1 dw ?
     num2 dw ?
     ans dw ?
@@ -57,6 +62,47 @@ START:
     ; Initialize data segment
     MOV AX, @DATA
     MOV DS, AX
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h    
 
     ; Input the first integer
     mov dx,OFFSET input_n1    

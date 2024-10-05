@@ -9,6 +9,11 @@
 .model small
 .stack 200h
 .data
+    text1 db 'Filename: EXER32.ASM$'
+	text2 db 'Programmer Name: JOHN DYMIER O. BORGONIA$'
+	text3 db 'Program Description: Fully working Calculator$'
+	text4 db 'Date Created: September 29, 2024$'
+
     calc DB 'THE CALCULATOR ',13,10,'$'
     cret DB 'Created by: JOHN DYMIER O. BORGONIA',13,10,'$'
     date DB 'Date: September 24, 2024',13,10,'$'
@@ -386,6 +391,47 @@ program_start:
 
 loop_start:
     CALL clear_screen
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h    
 
     mov dx,OFFSET calc    
     CALL print_string
