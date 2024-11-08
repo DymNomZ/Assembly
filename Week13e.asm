@@ -27,7 +27,48 @@
 .CODE
 MAIN PROC
     MOV AX, @DATA            
-    MOV DS, AX               
+    MOV DS, AX           
+
+    mov ah, 9
+	mov dx,offset text1
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text2
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text3
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+	mov ah, 9
+	mov dx,offset text4
+	int 21h
+
+	mov ah,02h
+	mov cl,0Ah ; NL
+	mov dl,cl
+	int 21h
+
+    mov ah,02h
+    mov cl,0Ah ; NL
+    mov dl,cl
+    int 21h           
  
 menu_loop:
 
