@@ -56,4 +56,13 @@
     mov bh, 0ceH
     int 10h
  
- 
+    mov ah, 06h
+    xor al, al
+    mov bh, 2Fh    ; CHANGE COLOR HEREEEEE!!!!
+    xor cx, cx     ; Upper left corner CH=row, CL=column
+    mov dx, 184Fh  ; lower right corner DH=row, DL=column 
+    mov ch, 0
+    mov cl, 1
+    mov dl, 78
+    mov dh, 3
+    int 10h
