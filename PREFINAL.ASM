@@ -15,17 +15,17 @@
     copyright       DB ' Copyright 2024$'
     
     main_menu       DB 'Main Menu                                                                     $'
-    main_menu2      DB '1. Balance Inquiry                                                            $'
-    main_menu3      DB '2. Deposit                                                                    $'
-    main_menu4      DB '3. Withdrawal                                                                 $'
+    main_menu2      DB '1. balance Inquiry                                                            $'
+    main_menu3      DB '2. deposit                                                                    $'
+    main_menu4      DB '3. withdrawal                                                                 $'
     main_menu5      DB '4. Exit                                                                       ',13,10
                     DB ' Enter your choice: $',13,10
     
-    bal_msg     DB ' Balance Inquiry',13,10
+    bal_msg     DB ' balance Inquiry',13,10
                 DB ' Your current balance: P$',13,10
-    dep_msg     DB ' Deposit',13,10
+    dep_msg     DB ' deposit',13,10
                 DB ' Enter deposit amount: P$',13,10
-    wd_msg      DB ' Withdrawal',13,10
+    wd_msg      DB ' withdrawal',13,10
                 DB ' Enter withdrawal amount: P$',13,10
     dep_succ    DB ' You deposited P$'
     wd_succ     DB ' You withdrew P$'
@@ -35,7 +35,7 @@
     err_bal     DB 'ERROR! Insufficient balance!                                                  $',13,10
     exit_msg    DB ' Exiting ATM',13,10,' Thank you!$'
     
-    BALANCE     DW 0    
+    balance     DW 0    
     TEMP        DW ?    
     BUFFER      DB 6    
                 DB ?
@@ -47,22 +47,22 @@ MAIN PROC
     MOV AX, @DATA
     MOV DS, AX
 
-    CALL CLEAR_SCREEN
+    CALL clear_screen
 
     mov ah, 06h
     xor al, al
     mov bh, 20h    ; Set Color (Green background and black font)
-    xor cx, cx     ; Upper left corner CH=row, CL=column
-    mov dx, 184Fh  ; lower right corner DH=row, DL=column 
+    xor cx, cx     
+    mov dx, 184Fh  
     mov ch, 0
     mov cl, 1
     mov dl, 78
     mov dh, 3
     int 10h
     
-    CALL SHOW_TITLE
+    CALL show_title
     
-MENU_LOOP:
+menu_loop:
     MOV DL, 0DH
     MOV AH, 02H
     INT 21H
@@ -75,19 +75,19 @@ MENU_LOOP:
     MOV DL, 0AH
     INT 21H
 
-    CALL DISPLAY_MENU
+    CALL display_menu
     
     MOV AH, 01H
     INT 21H
     
     CMP AL, '1'
-    JZ BALANCE_INQUIRY
+    JZ balance_inquiry
     CMP AL, '2'
-    JZ DEPOSIT
+    JZ deposit
     CMP AL, '3'
-    JZ WITHDRAWAL
+    JZ withdrawal
     CMP AL, '4'
-    JZ EXIT_PROGRAM
+    JZ exit_program
     
     MOV DL, 0DH
     MOV AH, 02H
@@ -108,21 +108,21 @@ MENU_LOOP:
     LEA DX, err_choice
     MOV AH, 09H
     INT 21H
-    JMP MENU_LOOP
+    JMP menu_loop
 
-BALANCE_INQUIRY:
-    JMP BALANCE_INQUIRY2
+balance_inquiry:
+    JMP balance_inquiry2
 
-DEPOSIT:
-    JMP DEPOSIT2
+deposit:
+    JMP deposit2
 
-WITHDRAWAL:
-    JMP WITHDRAWAL2
+withdrawal:
+    JMP withdrawal2
 
-EXIT_PROGRAM:
-    JMP EXIT_PROGRAM2
+exit_program:
+    JMP exit_program2
 
-BALANCE_INQUIRY2:
+balance_inquiry2:
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -134,11 +134,11 @@ BALANCE_INQUIRY2:
     MOV AH, 09H
     INT 21H
     
-    MOV AX, BALANCE
-    CALL DISPLAY_NUM2
-    JMP MENU_LOOP
+    MOV AX, balance
+    CALL display_num2
+    JMP menu_loop
 
-DEPOSIT2:
+deposit2:
     
     MOV DL, 0DH
     MOV AH, 02H
@@ -150,17 +150,17 @@ DEPOSIT2:
     MOV AH, 09H
     INT 21H
     
-    CALL INPUT_NUM
-    ADD BALANCE, AX
+    CALL input_num
+    ADD balance, AX
     
     LEA DX, dep_succ
     MOV AH, 09H
     INT 21H
     MOV AX, TEMP
-    CALL DISPLAY_NUM
-    JMP MENU_LOOP
+    CALL display_num
+    JMP menu_loop
 
-WITHDRAWAL2:
+withdrawal2:
     
     MOV DL, 0DH
     MOV AH, 02H
@@ -172,22 +172,22 @@ WITHDRAWAL2:
     MOV AH, 09H
     INT 21H
     
-    CALL INPUT_NUM
+    CALL input_num
     MOV BX, AX
     
-    MOV AX, BALANCE
+    MOV AX, balance
     CMP AX, BX
-    JB INSUFF_BALANCE
+    JB insufficient_balance
     
-    SUB BALANCE, BX
+    SUB balance, BX
     LEA DX, wd_succ
     MOV AH, 09H
     INT 21H
     MOV AX, BX
-    CALL DISPLAY_NUM
-    JMP MENU_LOOP
+    CALL display_num
+    JMP menu_loop
     
-INSUFF_BALANCE:
+insufficient_balance:
 
     LEA DX, space
     MOV AH, 09H
@@ -202,9 +202,9 @@ INSUFF_BALANCE:
     LEA DX, err_bal
     MOV AH, 09H
     INT 21H
-    JMP MENU_LOOP
+    JMP menu_loop
 
-EXIT_PROGRAM2:
+exit_program2:
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -221,7 +221,7 @@ EXIT_PROGRAM2:
 
 MAIN ENDP
 
-CLEAR_SCREEN PROC
+clear_screen PROC
     MOV AX, 0600H
     MOV BH, 07H
     MOV CX, 0000H
@@ -233,9 +233,9 @@ CLEAR_SCREEN PROC
     MOV DX, 0000H
     INT 10H
     RET
-CLEAR_SCREEN ENDP
+clear_screen ENDP
 
-SHOW_TITLE PROC
+show_title PROC
     
     LEA DX, cit_u
     MOV AH, 09H
@@ -272,9 +272,9 @@ SHOW_TITLE PROC
     INT 21H
     
     RET
-SHOW_TITLE ENDP
+show_title ENDP
 
-INPUT_NUM PROC
+input_num PROC
     PUSH BX
     PUSH CX
     PUSH DX
@@ -282,17 +282,17 @@ INPUT_NUM PROC
     XOR BX, BX  
     XOR CX, CX 
     
-INPUT_LOOP:
+input_loop:
     MOV AH, 01H
     INT 21H
     
     CMP AL, 13  
-    JE INPUT_DONE
+    JE finish_input
     
     CMP AL, '0'
-    JB INPUT_LOOP
+    JB input_loop
     CMP AL, '9'
-    JA INPUT_LOOP
+    JA input_loop
     
     SUB AL, '0'  
     MOV CL, AL
@@ -303,9 +303,9 @@ INPUT_LOOP:
     ADD AX, CX  
     MOV BX, AX
     
-    JMP INPUT_LOOP
+    JMP input_loop
     
-INPUT_DONE:
+finish_input:
     MOV AX, BX
     MOV TEMP, AX  
     
@@ -313,9 +313,9 @@ INPUT_DONE:
     POP CX
     POP BX
     RET
-INPUT_NUM ENDP
+input_num ENDP
 
-DISPLAY_NUM PROC
+display_num PROC
     PUSH AX
     PUSH BX
     PUSH CX
@@ -324,20 +324,20 @@ DISPLAY_NUM PROC
     MOV BX, 10   
     XOR CX, CX   
     
-DIVIDE_LOOP:
+divide_loop:
     XOR DX, DX
     DIV BX
     PUSH DX      
     INC CX
     TEST AX, AX
-    JNZ DIVIDE_LOOP
+    JNZ divide_loop
     
-DISPLAY_LOOP:
+display_loop:
     POP DX
     ADD DL, '0'  
     MOV AH, 02H
     INT 21H
-    LOOP DISPLAY_LOOP
+    LOOP display_loop
     
     LEA DX, dot_msg
     MOV AH, 09H
@@ -348,9 +348,9 @@ DISPLAY_LOOP:
     POP BX
     POP AX
     RET
-DISPLAY_NUM ENDP
+display_num ENDP
 
-DISPLAY_NUM2 PROC
+display_num2 PROC
     PUSH AX
     PUSH BX
     PUSH CX
@@ -359,29 +359,29 @@ DISPLAY_NUM2 PROC
     MOV BX, 10   
     XOR CX, CX   
     
-DIVIDE_LOOP2:
+divide_loop2:
     XOR DX, DX
     DIV BX
     PUSH DX      
     INC CX
     TEST AX, AX
-    JNZ DIVIDE_LOOP2
+    JNZ divide_loop2
     
-DISPLAY_LOOP2:
+display_loop2:
     POP DX
     ADD DL, '0'  
     MOV AH, 02H
     INT 21H
-    LOOP DISPLAY_LOOP2
+    LOOP display_loop2
     
     POP DX
     POP CX
     POP BX
     POP AX
     RET
-DISPLAY_NUM2 ENDP
+display_num2 ENDP
 
-DISPLAY_MENU PROC
+display_menu PROC
 
     LEA DX, space
     MOV AH, 09H
@@ -478,6 +478,6 @@ DISPLAY_MENU PROC
     INT 21H
 
     RET
-DISPLAY_MENU ENDP
+display_menu ENDP
 
 END MAIN
