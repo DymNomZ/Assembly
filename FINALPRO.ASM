@@ -7,7 +7,7 @@
 .STACK 100H
 .DATA
     space       DB ' $',0
-    newline     DB ' $',13,10
+    newline     DB 13,10,'$'
     dash        DB ' - P$'
     barrier     DB ' | $'
     period      DB '.$',13,10,'$'
@@ -35,11 +35,11 @@
                     DB '  Hello there! Welcome to Dymes Foods',13,10
                     DB '  It seems like you are a new user, please sign up for an account below.$',13,10,13,10
 
-    register_header  DB 13,10,13,10,' ---REGISTER---$',13,10
-    login_header     DB 13,10,13,10,' ---LOGIN---$',13,10
+    register_header  DB '                               ---REGISTER---$',13,10
+    login_header     DB '                               ---LOGIN---$',13,10
 
-    enter_username  DB 13,10,' Enter Username: $'
-    enter_password  DB 13,10,' Enter Password: $'
+    enter_username  DB 13,10,'                     Enter Username: $'
+    enter_password  DB 13,10,'                     Enter Password: $'
 
     register_succ   DB 13,10,' ---User Register was Successful!---$',13,10
     login_succ      DB 13,10,' ---User Login was Successful!---$',13,10
@@ -101,7 +101,7 @@
     exit_msg    DB 'Thank you for ordering! We hope you enjoy your meal!$'
     landing_exit_prompt DB ' Thank you for using the app!',13,10,' Order again soon!$'
 
-    usercounter dw 1
+    num_users dw 1
 
     def_empty_string DB 50 DUP('$')   ; debug purposes
 
@@ -189,22 +189,22 @@ MAIN PROC
     CALL BRANDING_COLORS
 
     LEA DX, branding
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     ; setup message colors
     mov ah, 06h
     mov ch, 18 ; row start
     mov cl, 1 ; col start
-    mov dh, 19  ; row end
+    mov dh, 24  ; row end
     mov dl, 78  ; col end
-    mov bh, 2Eh ; orange, yellow
+    mov bh, 2Eh ; green and yellow
     int 10h   
 
     LEA DX, setup
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
+    CALL PUT_NEWLINE
+    CALL PUT_NEWLINE
     CALL REGISTER_ACC1
 
     CALL CLEAR_SCREEN
@@ -217,7 +217,7 @@ ACC_LOOP:
     INT 21H
 
     ; Display account menu
-    CALL print_acc
+    CALL DISPLAY_ACC
     
     ; Await user input
     MOV AH, 01H
@@ -225,11 +225,11 @@ ACC_LOOP:
 
     ; Jumps to option
     CMP AL, '1'
-    JZ TYPED_LOGIN
+    JZ PROC_LOGIN
     CMP AL, '2'
-    JZ TYPED_REGISTER
+    JZ PROC_REGISTER
     CMP AL, '3'
-    JZ typed_landing_exit
+    JZ PROC_EXIT
     
     ; Invalid choice
     MOV DL, 0DH
@@ -239,183 +239,170 @@ ACC_LOOP:
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl, 0CEh   ; blinking red yellow
-    mov cx, 78 
-    int 10h
+    CALL BLINKING_FUNC
 
     LEA DX, menu_error
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     JMP ACC_LOOP
 
-TYPED_LOGIN:
+PROC_LOGIN:
     JMP ACC1_LOGGING
 
-TYPED_REGISTER:
-    JMP landing_registerTER
+PROC_REGISTER:
+    JMP LANDING_REGISTERING
 
-typed_landing_exit:
-    JMP landing_exitING
+PROC_EXIT:
+    JMP LANDING_EXITING
 
 ACC1_LOGGING:
     CALL LOGIN_ACC
 
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username1+2
-    CALL STRING_CHECKER          ; compares registered username and username inputted during login, pushes 1 to AL if same and 0 if not
+
+    ; compares registered username and username inputted during login
+    CALL STRING_CHECKER          
     cmp AL, 0                   
     je ACC2_LOGGING
 
     mov si, OFFSET login_password_input+2
     mov di, OFFSET password1+2
-    CALL STRING_CHECKER          ; compares registered password and password inputted during login, pushes 1 to AL if same and 0 if not
+    CALL STRING_CHECKER          
     cmp AL, 0
     je INVALID_LOGIN
 
     LEA DX, login_succ
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
-    JMP MENU_LOOP               ; if both checks are successful, jumps to main menu screen
+    ; display menu when checks are successful
+    JMP MENU_LOOP
 
 ACC2_LOGGING:
     
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username2+2
-    CALL STRING_CHECKER          ; compares registered username and username inputted during login, pushes 1 to AL if same and 0 if not
+    CALL STRING_CHECKER          
     cmp AL, 0
     je ACC3_LOGGING
 
     mov si, OFFSET login_password_input+2
     mov di, OFFSET password2+2
-    CALL STRING_CHECKER          ; compares registered password and password inputted during login, pushes 1 to AL if same and 0 if not
+    CALL STRING_CHECKER          
     cmp AL, 0
     je INVALID_LOGIN
 
     LEA DX, login_succ
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
-    JMP MENU_LOOP               ; if both checks are successful, jumps to main menu screen
+    JMP MENU_LOOP               
 
 ACC3_LOGGING:
     
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username3+2
-    CALL STRING_CHECKER          ; compares registered username and username inputted during login, pushes 1 to AL if same and 0 if not
+    CALL STRING_CHECKER         
     cmp AL, 0
     je INVALID_LOGIN
 
     mov si, OFFSET login_password_input+2
     mov di, OFFSET password3+2
-    CALL STRING_CHECKER          ; compares registered password and password inputted during login, pushes 1 to AL if same and 0 if not
+    CALL STRING_CHECKER          
     cmp AL, 0
     je INVALID_LOGIN
 
     LEA DX, login_succ
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
-    JMP MENU_LOOP               ; if both checks are successful, jumps to main menu screen
+    JMP MENU_LOOP               
 
-INVALID_LOGIN:                  ; results if compared strings are not equal
+INVALID_LOGIN:
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl, 0CEh   ; blinking red yellow
-    mov cx, 78 
-    int 10h
+    CALL BLINKING_FUNC
 
     LEA DX, login_error
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV SI, OFFSET login_username_input+2      ; initializes username back to null in case old account exists
+    ; initialize username and passwords back to null
+    MOV SI, OFFSET login_username_input+2
     MOV CX, [SI]
     ADD SI, CX
     CALL STRING_CLEAR
 
-    MOV SI, OFFSET login_password_input+2      ; initializes password back to null in case old account exists
+    MOV SI, OFFSET login_password_input+2
     MOV CX, [SI]
     ADD SI, CX
     CALL STRING_CLEAR
 
-    JMP ACC_LOOP                ; loops back to account menu after displaying error
+    JMP ACC_LOOP
 
-landing_registerTER:
-    cmp usercounter, 1            
-    jne ACC3_REGISTER_1         ; jumps if greater than 1
+LANDING_REGISTERING:
+    cmp num_users, 1            
+    jne ACC3_REGISTER_1
 
     CALL REGISTER_ACC2
 
     mov si, OFFSET username1+2
     mov di, OFFSET username2+2
-    CALL STRING_CHECKER          ; checks if newly registered username already exists, jumps to REGISTER_SUCCESSFUL if username is unique
+
+    ; check if inputted username already exists
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je REGISTER_SUCCESSFUL
 
     LEA DX, username_exists
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
     
     JMP ACC_LOOP
 
 ACC3_REGISTER_1:
-    cmp usercounter, 3             ; jumps if max user count has been reached
+    ; check if max number of users have been reached
+    cmp num_users, 3
     je ACC_FULL
 
     CALL REGISTER_ACC3
 
     mov si, OFFSET username1+2
     mov di, OFFSET username3+2
-    CALL STRING_CHECKER          ; checks if newly registered username already exists, jumps to ACC3_REGISTER_2 if username is unique
+    CALL STRING_CHECKER          
     cmp AL, 0                   
     je ACC3_REGISTER_2
 
     LEA DX, username_exists
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
     
     JMP ACC_LOOP
 
 ACC3_REGISTER_2:
     mov si, OFFSET username2+2
     mov di, OFFSET username3+2
-    CALL STRING_CHECKER          ; checks if newly registered username already exists, jumps to REGISTER_SUCCESSFUL if username is unique
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je REGISTER_SUCCESSFUL
 
     LEA DX, username_exists
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
     
     JMP ACC_LOOP
     
 ACC_FULL:
     LEA DX, max_register
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
     JMP ACC_LOOP
 
 REGISTER_SUCCESSFUL:
     LEA DX, register_succ
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
-    INC usercounter
+    INC num_users
     
     JMP ACC_LOOP
 
-landing_exitING:
+LANDING_EXITING:
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -424,10 +411,10 @@ landing_exitING:
     INT 21H
 
     LEA DX, landing_exit_prompt
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV AH, 4CH             ; fully exits the program
+    ; end program
+    MOV AH, 4CH
     INT 21H
 
 
@@ -438,14 +425,12 @@ MENU_LOOP:
     MOV DL, 0AH
     INT 21H
 
-    ; Display main menu
-    CALL print_menu
+    CALL DISPLAY_MENU
     
-    ; Await user input
+    ; Wait for user input
     MOV AH, 01H
     INT 21H
     
-    ; Jumps to option
     CMP AL, '1'
     JZ TYPED_CREATE
     CMP AL, '2'
@@ -455,7 +440,6 @@ MENU_LOOP:
     CMP AL, '4'
     JZ typed_EXIT
     
-    ; Invalid choice
     MOV DL, 0DH
     MOV AH, 02H
     INT 21H
@@ -463,18 +447,12 @@ MENU_LOOP:
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl, 0CEh   ; blinking red yellow
-    mov cx, 78 
-    int 10h
+    CALL BLINKING_FUNC
 
     LEA DX, menu_error
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     JMP MENU_LOOP
 
 TYPED_CREATE:
@@ -499,7 +477,7 @@ CREATE_ORDER:
 
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username1+2
-    CALL STRING_CHECKER          ; checks if current user is account 1, creates order for acc 1 if yes, jumps to 2 if no
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je CREATE_ORDER2
 
@@ -510,7 +488,7 @@ CREATE_ORDER:
 CREATE_ORDER2:
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username2+2
-    CALL STRING_CHECKER          ; checks if current user is account 1, creates order for acc 1 if yes, jumps to 2 if no
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je CREATE_ORDER3
 
@@ -533,7 +511,7 @@ REVIEW_ORDER:
 
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username1+2
-    CALL STRING_CHECKER          ; checks if current user is account 1, reviews order for acc 1 if yes, jumps to 2 if no
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je REVIEW_ORDER2
 
@@ -544,7 +522,7 @@ REVIEW_ORDER:
 REVIEW_ORDER2:
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username2+2
-    CALL STRING_CHECKER          ; checks if current user is account 1, reviews order for acc 1 if yes, jumps to 2 if no
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je REVIEW_ORDER3
 
@@ -566,24 +544,21 @@ DELETE_ORDER:
     INT 21H
 
     LEA DX, delete_order_prompt
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    ; Await user input
+    ; Wait for user input
     MOV AH, 01H
     INT 21H
 
-    ; Jumps to option
     CMP AL, 'Y'
-    JZ typed_YES_DELETE
+    JZ CONFIRM_DELETE
     CMP AL, 'y'
-    JZ typed_YES_DELETE
+    JZ CONFIRM_DELETE
     CMP AL, 'N'
-    JZ typed_CANCEL_DELETE
+    JZ CANCEL_DELETE
     CMP AL, 'n'
-    JZ typed_CANCEL_DELETE
+    JZ CANCEL_DELETE
 
-    ; Invalid choice
     MOV DL, 0DH
     MOV AH, 02H
     INT 21H
@@ -591,63 +566,57 @@ DELETE_ORDER:
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl, 0CEh   ; blinking red yellow
-    mov cx, 78 
-    int 10h
+    CALL BLINKING_FUNC
 
     LEA DX, menu_error
-    MOV AH, 09H
-    INT 21H
-    JMP MENU_LOOP       ; loops back to menu screen if Y, y, N, or n were not inputted
+    CALL DISPLAY_STRING
 
-typed_YES_DELETE:
+    ; if either option is selected go back to the menu screen
+    JMP MENU_LOOP
+
+CONFIRM_DELETE:
     JMP DELETING_ORDER
 
-typed_CANCEL_DELETE:
+CANCEL_DELETE:
     JMP CANCELING_DELETE
 
 DELETING_ORDER:
     LEA DX, deleted_order_msg
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username1+2
-    CALL STRING_CHECKER          ; checks if current user is account 1, deletes order for acc 1 if yes, jumps to 2 if no
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je DELETING_ORDER2
 
-    CALL reset_all_zero_acc1
+    CALL RESET_ACC_1
 
     JMP MENU_LOOP
 
 DELETING_ORDER2:
     mov si, OFFSET login_username_input+2
     mov di, OFFSET username2+2
-    CALL STRING_CHECKER          ; checks if current user is account 1, deletes order for acc 1 if yes, jumps to 2 if no
+    CALL STRING_CHECKER
     cmp AL, 0                   
     je DELETING_ORDER3
 
-    CALL reset_all_zero_acc2
+    CALL RESET_ACC_2
 
     JMP MENU_LOOP
 
 DELETING_ORDER3:
-    CALL reset_all_zero_acc3
+    CALL RESET_ACC_3
 
     JMP MENU_LOOP
 
 CANCELING_DELETE:
     LEA DX, cancel_delete_order_msg    
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    JMP MENU_LOOP       ; returns back to menu screen without deleting orders
+    JMP MENU_LOOP
 
 EXITING:
 
@@ -658,10 +627,9 @@ EXITING:
     INT 21H
 
     LEA DX, exit_msg
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
-    JMP ACC_LOOP        ; returns back to account screen
+    JMP ACC_LOOP
 
 MAIN ENDP
 
@@ -677,9 +645,34 @@ READ_STRING PROC
     RET
 READ_STRING ENDP
 
+BLINKING_FUNC PROC
+    mov ah, 09h
+    mov bh, 0
+    mov bl, 0CEh   ; blinking red yellow
+    mov cx, 78 
+    int 10h
+    RET
+BLINKING_FUNC ENDP
+
+DEF_COLOR PROC
+    mov ah, 09h
+    mov bh, 0
+    mov bl, 2Eh   ; green and yellow
+    mov cx, 78 
+    int 10h
+    RET
+DEF_COLOR ENDP
+
+PUT_NEWLINE PROC
+    LEA DX, newline
+    CALL DISPLAY_STRING
+    RET
+PUT_NEWLINE ENDP
+
 ; account register functions
 ; this one is called when the program starts
 REGISTER_ACC1 PROC          
+
     LEA DX, register_header
     CALL DISPLAY_STRING
 
@@ -688,9 +681,6 @@ REGISTER_ACC1 PROC
 
     LEA DX, username1
     CALL READ_STRING
-
-    LEA DX, newline
-    CALL DISPLAY_STRING
 
     LEA DX, enter_password
     CALL DISPLAY_STRING
@@ -714,6 +704,7 @@ REGISTER_ACC1 PROC
 REGISTER_ACC1 ENDP
 
 REGISTER_ACC2 PROC
+    LEA DX, register_header
     CALL DISPLAY_STRING
 
     LEA DX, enter_username
@@ -782,28 +773,22 @@ REGISTER_ACC3 ENDP
 
 LOGIN_ACC PROC
     LEA DX, login_header
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
     LEA DX, enter_username
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
     LEA DX, login_username_input
-    MOV AH, 0Ah               ; DOS function to read a string 
-    INT 21h 
+    CALL READ_STRING
 
     LEA DX, newline
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
     LEA DX, enter_password
-    MOV AH, 09h               ; DOS function to display a string 
-    INT 21h 
+    CALL DISPLAY_STRING
 
     LEA DX, login_password_input
-    MOV AH, 0Ah               ; DOS function to read a string 
-    INT 21h 
+    CALL READ_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -837,8 +822,7 @@ CLEAR_SCREEN ENDP
 DISPLAY_HEADER PROC
     
     LEA DX, header
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     RET
 DISPLAY_HEADER ENDP
@@ -901,16 +885,15 @@ DIVIDE_LOOP:
     TEST AX, AX
     JNZ DIVIDE_LOOP
     
-print_num_1:
+DISPLAY_NUM_1:
     POP DX
     ADD DL, '0'  ; Convert to ASCII
     MOV AH, 02H
     INT 21H
-    LOOP print_num_1
+    LOOP DISPLAY_NUM_1
     
     LEA DX, period
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
     POP DX
     POP CX
@@ -936,12 +919,12 @@ DIVIDE_LOOP2:
     TEST AX, AX
     JNZ DIVIDE_LOOP2
     
-print_num_2:
+DISPLAY_NUM_2:
     POP DX
     ADD DL, '0'  ; Convert to ASCII
     MOV AH, 02H
     INT 21H
-    LOOP print_num_2
+    LOOP DISPLAY_NUM_2
     
     POP DX
     POP CX
@@ -951,33 +934,29 @@ print_num_2:
 DISPLAY_NUM2 ENDP
 
 INPUT_order_ice_creamCC1 PROC
-    CALL reset_all_zero_acc1     ; resets all orders to 0 first to ensure orders dont add up
+    CALL RESET_ACC_1
 
     LEA DX, order_pizzaenu
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, item_amount
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, order_ice_cream
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    CALL INPUT_NUM          ; function to input number
-    ADD num_ice_cream1, AX       ; adds inputted number to originally 0
+    CALL INPUT_NUM 
+    ADD num_ice_cream1, AX       ; default value to 0
 
     mov ax, num_ice_cream1
     mov bx, ice_cream_price
-    mul bx                  ; multiplies number of orders to individual price of item
-        mov total_ice_cream1, ax
+    mul bx                  
+    mov total_ice_cream1, ax
 
-    ADD sum1, ax             ; adds price of order to overall total price
+    ADD sum1, ax 
     
     LEA DX, order_burger 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_burger1, AX
@@ -985,13 +964,12 @@ INPUT_order_ice_creamCC1 PROC
     mov ax, num_burger1
     mov bx, burger_price
     mul bx
-        mov total_burger1, ax
+    mov total_burger1, ax
 
     ADD sum1, ax
     
     LEA DX, order_chicken 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_chicken1, AX
@@ -999,13 +977,12 @@ INPUT_order_ice_creamCC1 PROC
     mov ax, num_chicken1
     mov bx, chicken_price
     mul bx
-        mov total_chicken1, ax
+    mov total_chicken1, ax
 
     ADD sum1, ax
     
     LEA DX, order_taco 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_taco1, AX
@@ -1013,13 +990,12 @@ INPUT_order_ice_creamCC1 PROC
     mov ax, num_taco1
     mov bx, taco_price
     mul bx
-        mov total_taco1, ax
+    mov total_taco1, ax
 
     ADD sum1, ax
     
     LEA DX, order_pizza 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_pizza1, AX
@@ -1027,48 +1003,43 @@ INPUT_order_ice_creamCC1 PROC
     mov ax, num_pizza1
     mov bx, pizza_price
     mul bx
-        mov total_pizza1, ax
+    mov total_pizza1, ax
 
     ADD sum1, ax
     
     LEA DX, order_total 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
-    MOV AX, sum1                 ; prints overall total price
+    MOV AX, sum1
     CALL DISPLAY_NUM2
     
     RET
 INPUT_order_ice_creamCC1 ENDP
 
 INPUT_order_ice_creamCC2 PROC
-    CALL reset_all_zero_acc2     ; resets all orders to 0 first to ensure orders dont add up
+    CALL RESET_ACC_2
 
     LEA DX, order_pizzaenu
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, item_amount
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, order_ice_cream
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    CALL INPUT_NUM          ; function to input number
-    ADD num_ice_cream2, AX       ; adds inputted number to originally 0
+    CALL INPUT_NUM
+    ADD num_ice_cream2, AX
 
     mov ax, num_ice_cream2
     mov bx, ice_cream_price
-    mul bx                  ; multiplies number of orders to individual price of item
-        mov total_ice_cream2, ax
+    mul bx                 
+    mov total_ice_cream2, ax
 
-    ADD sum2, ax             ; adds price of order to overall total price
+    ADD sum2, ax             
     
     LEA DX, order_burger 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_burger2, AX
@@ -1076,13 +1047,12 @@ INPUT_order_ice_creamCC2 PROC
     mov ax, num_burger2
     mov bx, burger_price
     mul bx
-        mov total_burger2, ax
+    mov total_burger2, ax
 
     ADD sum2, ax
     
     LEA DX, order_chicken 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_chicken2, AX
@@ -1090,13 +1060,12 @@ INPUT_order_ice_creamCC2 PROC
     mov ax, num_chicken2
     mov bx, chicken_price
     mul bx
-        mov total_chicken2, ax
+    mov total_chicken2, ax
 
     ADD sum2, ax
     
     LEA DX, order_taco 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_taco2, AX
@@ -1104,13 +1073,12 @@ INPUT_order_ice_creamCC2 PROC
     mov ax, num_taco2
     mov bx, taco_price
     mul bx
-        mov total_taco2, ax
+    mov total_taco2, ax
 
     ADD sum2, ax
     
     LEA DX, order_pizza 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_pizza2, AX
@@ -1118,48 +1086,43 @@ INPUT_order_ice_creamCC2 PROC
     mov ax, num_pizza2
     mov bx, pizza_price
     mul bx
-        mov total_pizza2, ax
+    mov total_pizza2, ax
 
     ADD sum2, ax
     
     LEA DX, order_total 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
-    MOV AX, sum2                 ; prints overall total price
+    MOV AX, sum2
     CALL DISPLAY_NUM2
     
     RET
 INPUT_order_ice_creamCC2 ENDP
 
 INPUT_order_ice_creamCC3 PROC
-    CALL reset_all_zero_acc3     ; resets all orders to 0 first to ensure orders dont add up
+    CALL RESET_ACC_3
 
     LEA DX, order_pizzaenu
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, item_amount
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, order_ice_cream
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    CALL INPUT_NUM          ; function to input number
-    ADD num_ice_cream3, AX       ; adds inputted number to originally 0
+    CALL INPUT_NUM
+    ADD num_ice_cream3, AX
 
     mov ax, num_ice_cream3
     mov bx, ice_cream_price
-    mul bx                  ; multiplies number of orders to individual price of item
-        mov total_ice_cream3, ax
+    mul bx                  
+    mov total_ice_cream3, ax
 
-    ADD sum3, ax             ; adds price of order to overall total price
+    ADD sum3, ax
     
     LEA DX, order_burger 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_burger3, AX
@@ -1167,13 +1130,12 @@ INPUT_order_ice_creamCC3 PROC
     mov ax, num_burger3
     mov bx, burger_price
     mul bx
-        mov total_burger3, ax
+    mov total_burger3, ax
 
     ADD sum3, ax
     
     LEA DX, order_chicken 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_chicken3, AX
@@ -1181,13 +1143,12 @@ INPUT_order_ice_creamCC3 PROC
     mov ax, num_chicken3
     mov bx, chicken_price
     mul bx
-        mov total_chicken3, ax
+    mov total_chicken3, ax
 
     ADD sum3, ax
     
     LEA DX, order_taco 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_taco3, AX
@@ -1195,13 +1156,12 @@ INPUT_order_ice_creamCC3 PROC
     mov ax, num_taco3
     mov bx, taco_price
     mul bx
-        mov total_taco3, ax
+    mov total_taco3, ax
 
     ADD sum3, ax
     
     LEA DX, order_pizza 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     CALL INPUT_NUM
     ADD num_pizza3, AX
@@ -1209,239 +1169,227 @@ INPUT_order_ice_creamCC3 PROC
     mov ax, num_pizza3
     mov bx, pizza_price
     mul bx
-        mov total_pizza3, ax
+    mov total_pizza3, ax
 
     ADD sum3, ax
     
     LEA DX, order_total 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
-    MOV AX, sum3                 ; prints overall total price
+    MOV AX, sum3 
     CALL DISPLAY_NUM2
     
     RET
 INPUT_order_ice_creamCC3 ENDP
 
-reset_all_zero_acc1 PROC
-    MOV AX, sum1          ; resets to 0
+; the reset functions reset everything back to 0
+RESET_ACC_1 PROC
+    MOV AX, sum1          
     MOV BX, AX
     SUB sum1, BX
 
-    MOV AX, num_ice_cream1          ; resets to 0
+    MOV AX, num_ice_cream1          
     MOV BX, AX
     SUB num_ice_cream1, BX
 
-    MOV AX, total_ice_cream1          ; resets to 0
+    MOV AX, total_ice_cream1          
     MOV BX, AX
     SUB total_ice_cream1, BX
 
-    MOV AX, num_burger1          ; resets to 0
+    MOV AX, num_burger1          
     MOV BX, AX
     SUB num_burger1, BX
 
-    MOV AX, total_burger1          ; resets to 0
+    MOV AX, total_burger1          
     MOV BX, AX
     SUB total_burger1, BX
 
-    MOV AX, num_chicken1          ; resets to 0
+    MOV AX, num_chicken1          
     MOV BX, AX
     SUB num_chicken1, BX
 
-    MOV AX, total_chicken1          ; resets to 0
+    MOV AX, total_chicken1          
     MOV BX, AX
     SUB total_chicken1, BX
 
-    MOV AX, num_taco1          ; resets to 0
+    MOV AX, num_taco1          
     MOV BX, AX
     SUB num_taco1, BX
 
-    MOV AX, total_taco1          ; resets to 0
+    MOV AX, total_taco1          
     MOV BX, AX
     SUB total_taco1, BX
 
-    MOV AX, num_pizza1          ; resets to 0
+    MOV AX, num_pizza1          
     MOV BX, AX
     SUB num_pizza1, BX
 
-    MOV AX, total_pizza1          ; resets to 0
+    MOV AX, total_pizza1          
     MOV BX, AX
     SUB total_pizza1, BX
     RET
-reset_all_zero_acc1 ENDP
+RESET_ACC_1 ENDP
 
-reset_all_zero_acc2 PROC
-    MOV AX, sum2          ; resets to 0
+RESET_ACC_2 PROC
+    MOV AX, sum2          
     MOV BX, AX
     SUB sum2, BX
 
-    MOV AX, num_ice_cream2          ; resets to 0
+    MOV AX, num_ice_cream2          
     MOV BX, AX
     SUB num_ice_cream2, BX
 
-    MOV AX, total_ice_cream2          ; resets to 0
+    MOV AX, total_ice_cream2          
     MOV BX, AX
     SUB total_ice_cream2, BX
 
-    MOV AX, num_burger2          ; resets to 0
+    MOV AX, num_burger2          
     MOV BX, AX
     SUB num_burger2, BX
 
-    MOV AX, total_burger2          ; resets to 0
+    MOV AX, total_burger2          
     MOV BX, AX
     SUB total_burger2, BX
 
-    MOV AX, num_chicken2          ; resets to 0
+    MOV AX, num_chicken2          
     MOV BX, AX
     SUB num_chicken2, BX
 
-    MOV AX, total_chicken2          ; resets to 0
+    MOV AX, total_chicken2          
     MOV BX, AX
     SUB total_chicken2, BX
 
-    MOV AX, num_taco2          ; resets to 0
+    MOV AX, num_taco2          
     MOV BX, AX
     SUB num_taco2, BX
 
-    MOV AX, total_taco2          ; resets to 0
+    MOV AX, total_taco2          
     MOV BX, AX
     SUB total_taco2, BX
 
-    MOV AX, num_pizza2          ; resets to 0
+    MOV AX, num_pizza2          
     MOV BX, AX
     SUB num_pizza2, BX
 
-    MOV AX, total_pizza2          ; resets to 0
+    MOV AX, total_pizza2          
     MOV BX, AX
     SUB total_pizza2, BX
     RET
-reset_all_zero_acc2 ENDP
+RESET_ACC_2 ENDP
 
-reset_all_zero_acc3 PROC
-    MOV AX, sum3          ; resets to 0
+RESET_ACC_3 PROC
+    MOV AX, sum3          
     MOV BX, AX
     SUB sum3, BX
 
-    MOV AX, num_ice_cream3          ; resets to 0
+    MOV AX, num_ice_cream3          
     MOV BX, AX
     SUB num_ice_cream3, BX
 
-    MOV AX, total_ice_cream3          ; resets to 0
+    MOV AX, total_ice_cream3          
     MOV BX, AX
     SUB total_ice_cream3, BX
 
-    MOV AX, num_burger3          ; resets to 0
+    MOV AX, num_burger3          
     MOV BX, AX
     SUB num_burger3, BX
 
-    MOV AX, total_burger3          ; resets to 0
+    MOV AX, total_burger3          
     MOV BX, AX
     SUB total_burger3, BX
 
-    MOV AX, num_chicken3          ; resets to 0
+    MOV AX, num_chicken3          
     MOV BX, AX
     SUB num_chicken3, BX
 
-    MOV AX, total_chicken3          ; resets to 0
+    MOV AX, total_chicken3          
     MOV BX, AX
     SUB total_chicken3, BX
 
-    MOV AX, num_taco3          ; resets to 0
+    MOV AX, num_taco3          
     MOV BX, AX
     SUB num_taco3, BX
 
-    MOV AX, total_taco3          ; resets to 0
+    MOV AX, total_taco3          
     MOV BX, AX
     SUB total_taco3, BX
 
-    MOV AX, num_pizza3          ; resets to 0
+    MOV AX, num_pizza3          
     MOV BX, AX
     SUB num_pizza3, BX
 
-    MOV AX, total_pizza3          ; resets to 0
+    MOV AX, total_pizza3          
     MOV BX, AX
     SUB total_pizza3, BX
     RET
-reset_all_zero_acc3 ENDP
+RESET_ACC_3 ENDP
 
 REVIEW_order_ice_creamCC1 PROC
     LEA DX, curr_order
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, curr_ice_cream
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV AX, num_ice_cream1           ; prints number of orders of the item
+    MOV AX, num_ice_cream1   
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV AX, total_ice_cream1          ; prints total price of item
+    MOV AX, total_ice_cream1    
     CALL DISPLAY_NUM2
 
     LEA DX, curr_burger
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_burger1
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_burger1
     CALL DISPLAY_NUM2
 
     LEA DX, curr_chicken
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_chicken1
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_chicken1
     CALL DISPLAY_NUM2
 
     LEA DX, curr_taco
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_taco1
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_taco1
     CALL DISPLAY_NUM2
 
     LEA DX, curr_pizza
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_pizza1
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_pizza1
     CALL DISPLAY_NUM2
     
     LEA DX, order_total 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
     MOV AX, sum1
     CALL DISPLAY_NUM2
@@ -1451,82 +1399,70 @@ REVIEW_order_ice_creamCC1 ENDP
 
 REVIEW_order_ice_creamCC2 PROC
     LEA DX, curr_order
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, curr_ice_cream
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV AX, num_ice_cream2           ; prints number of orders of the item
+    MOV AX, num_ice_cream2     
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV AX, total_ice_cream2          ; prints total price of item
+    MOV AX, total_ice_cream2    
     CALL DISPLAY_NUM2
 
     LEA DX, curr_burger
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_burger2
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_burger2
     CALL DISPLAY_NUM2
 
     LEA DX, curr_chicken
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_chicken2
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_chicken2
     CALL DISPLAY_NUM2
 
     LEA DX, curr_taco
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_taco2
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_taco2
     CALL DISPLAY_NUM2
 
     LEA DX, curr_pizza
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_pizza2
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_pizza2
     CALL DISPLAY_NUM2
     
     LEA DX, order_total 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
     MOV AX, sum2
     CALL DISPLAY_NUM2
@@ -1536,82 +1472,70 @@ REVIEW_order_ice_creamCC2 ENDP
 
 REVIEW_order_ice_creamCC3 PROC
     LEA DX, curr_order
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     LEA DX, curr_ice_cream
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV AX, num_ice_cream3           ; prints number of orders of the item
+    MOV AX, num_ice_cream3         
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    MOV AX, total_ice_cream3          ; prints total price of item
+    MOV AX, total_ice_cream3         
     CALL DISPLAY_NUM2
 
     LEA DX, curr_burger
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_burger3
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_burger3
     CALL DISPLAY_NUM2
 
     LEA DX, curr_chicken
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_chicken3
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_chicken3
     CALL DISPLAY_NUM2
 
     LEA DX, curr_taco
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_taco3
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_taco3
     CALL DISPLAY_NUM2
 
     LEA DX, curr_pizza
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, num_pizza3
     CALL DISPLAY_NUM2
 
     LEA DX, dash
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV AX, total_pizza3
     CALL DISPLAY_NUM2
     
     LEA DX, order_total 
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
     
     MOV AX, sum3
     CALL DISPLAY_NUM2
@@ -1619,20 +1543,14 @@ REVIEW_order_ice_creamCC3 PROC
     RET
 REVIEW_order_ice_creamCC3 ENDP
 
-print_acc PROC
+DISPLAY_ACC PROC
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl, 6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, landing_header
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -1641,18 +1559,12 @@ print_acc PROC
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl,  6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, landing_login
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -1661,18 +1573,12 @@ print_acc PROC
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl,  6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, landing_register
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -1681,37 +1587,25 @@ print_acc PROC
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl,  6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, landing_exit
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     RET
-print_acc ENDP
+DISPLAY_ACC ENDP
 
-print_menu PROC
+DISPLAY_MENU PROC
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl, 6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, menu_title
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -1720,18 +1614,12 @@ print_menu PROC
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl,  6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, menue_makeedit
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -1740,18 +1628,12 @@ print_menu PROC
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl,  6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, menu_review
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -1760,18 +1642,12 @@ print_menu PROC
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl,  6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, menu_delete
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     MOV DL, 0DH
     MOV AH, 02H
@@ -1780,21 +1656,15 @@ print_menu PROC
     INT 21H
 
     LEA DX, space
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
-    mov ah, 09h
-    mov bh, 0
-    mov bl,  6Eh ; orange, yellow
-    mov cx, 78 
-    int 10h
+    CALL DEF_COLOR
 
     LEA DX, menu_exit
-    MOV AH, 09H
-    INT 21H
+    CALL DISPLAY_STRING
 
     RET
-print_menu ENDP
+DISPLAY_MENU ENDP
 
 BRANDING_COLORS PROC
     ; branding colors
@@ -1899,7 +1769,8 @@ BRANDING_COLORS PROC
 
 BRANDING_COLORS ENDP
 
-STRING_CHECKER proc              ; function to compare two strings
+; function to compare two strings
+STRING_CHECKER PROC
     CMP BYTE PTR [SI], '$'
     JE EQUAL 
     LOOP_COMPARE:
@@ -1917,7 +1788,7 @@ STRING_CHECKER proc              ; function to compare two strings
     NOT_EQUAL:
         MOV AL, 0               ; moves 0 to AL if both strings are different
         ret
-STRING_CHECKER endp
+STRING_CHECKER ENDP
 
 STRING_CLEAR PROC
     CLEAR_LOOP:
@@ -1927,16 +1798,13 @@ STRING_CLEAR PROC
         JNE NULL_COMPLETE
 
         lea dx, barrier
-        mov ah, 09h
-        int 21h
+        CALL DISPLAY_STRING
         
         lea dx, BYTE PTR [SI]
-        mov ah, 09h
-        int 21h
+        CALL DISPLAY_STRING
 
         lea dx, barrier
-        mov ah, 09h
-        int 21h
+        CALL DISPLAY_STRING
 
         MOV BYTE PTR [SI], '$'
         DEC SI
