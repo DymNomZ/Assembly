@@ -41,8 +41,8 @@
     enter_username  DB 13,10,'                     Enter Username: $'
     enter_password  DB 13,10,'                     Enter Password: $'
 
-    register_succ   DB 13,10,' ---User Register was Successful!---$',13,10
-    login_succ      DB 13,10,' ---User Login was Successful!---$',13,10
+    register_succ   DB 13,10,'           User Register was Successful! (Press any key to continue)$',13,10
+    login_succ      DB 13,10,'                         User Login was Successful!$',13,10
 
     max_register      DB 13,10,' We have reached the max number of registered users! We apologize for the inconvenience.$',13,10
     username_exists   DB 13,10,' The username is already in use, please choose another one.$',13,10
@@ -60,8 +60,8 @@
     menu_exit      DB ' 4. Exit                                                                      ',13,10
                    DB '  Enter your choice: $',13,10
 
-    menu_error  DB ' ERROR! Invalid choice!                                                        $',13,10
-    login_error DB ' ERROR! Account is not recognized!                                             $',13,10
+    menu_error  DB ' ERROR! Invalid choice! (Press any key to continue)                            $',13,10
+    login_error DB ' ERROR! Account is not recognized! (Press any key to continue)                 $',13,10
 
     order_pizzaenu  DB '----SELECT FAST FOOD----', 13,10
                 DB '  Ice Cream   -  P99.00', 13,10
@@ -181,7 +181,7 @@ MAIN PROC
     mov cl, 1 ; col start
     mov dh, 3  ; row end
     mov dl, 78  ; col end
-    mov bh, 20h ; green, black
+    mov bh, 2Eh ; green and yellow
     int 10h
 
     CALL DISPLAY_HEADER
@@ -210,11 +210,9 @@ MAIN PROC
     CALL CLEAR_SCREEN
 
 ACC_LOOP:
-    MOV DL, 0DH
-    MOV AH, 02H
-    INT 21H
-    MOV DL, 0AH
-    INT 21H
+
+    CALL CLEAR_SCREEN
+    CALL COLOR_SCREEN
 
     ; Display account menu
     CALL DISPLAY_ACC
@@ -245,6 +243,9 @@ ACC_LOOP:
 
     LEA DX, menu_error
     CALL DISPLAY_STRING
+
+    CALL WAIT_USER_INPUT
+
     JMP ACC_LOOP
 
 PROC_LOGIN:
@@ -273,9 +274,6 @@ ACC1_LOGGING:
     cmp AL, 0
     je INVALID_LOGIN
 
-    LEA DX, login_succ
-    CALL DISPLAY_STRING
-
     ; display menu when checks are successful
     JMP MENU_LOOP
 
@@ -293,9 +291,6 @@ ACC2_LOGGING:
     cmp AL, 0
     je INVALID_LOGIN
 
-    LEA DX, login_succ
-    CALL DISPLAY_STRING
-
     JMP MENU_LOOP               
 
 ACC3_LOGGING:
@@ -311,9 +306,6 @@ ACC3_LOGGING:
     CALL STRING_CHECKER          
     cmp AL, 0
     je INVALID_LOGIN
-
-    LEA DX, login_succ
-    CALL DISPLAY_STRING
 
     JMP MENU_LOOP               
 
@@ -336,6 +328,8 @@ INVALID_LOGIN:
     MOV CX, [SI]
     ADD SI, CX
     CALL STRING_CLEAR
+
+    CALL WAIT_USER_INPUT
 
     JMP ACC_LOOP
 
@@ -399,6 +393,8 @@ REGISTER_SUCCESSFUL:
     CALL DISPLAY_STRING
 
     INC num_users
+
+    CALL WAIT_USER_INPUT
     
     JMP ACC_LOOP
 
@@ -419,17 +415,18 @@ LANDING_EXITING:
 
 
 MENU_LOOP:
-    MOV DL, 0DH
-    MOV AH, 02H
-    INT 21H
-    MOV DL, 0AH
-    INT 21H
+
+    CALL CLEAR_SCREEN
+    CALL COLOR_SCREEN
+
+    LEA DX, login_succ
+    CALL DISPLAY_STRING
+
+    CALL PUT_NEWLINE
 
     CALL DISPLAY_MENU
     
-    ; Wait for user input
-    MOV AH, 01H
-    INT 21H
+    CALL WAIT_USER_INPUT
     
     CMP AL, '1'
     JZ TYPED_CREATE
@@ -546,9 +543,7 @@ DELETE_ORDER:
     LEA DX, delete_order_prompt
     CALL DISPLAY_STRING
 
-    ; Wait for user input
-    MOV AH, 01H
-    INT 21H
+    CALL WAIT_USER_INPUT
 
     CMP AL, 'Y'
     JZ CONFIRM_DELETE
@@ -663,15 +658,35 @@ DEF_COLOR PROC
     RET
 DEF_COLOR ENDP
 
+COLOR_SCREEN PROC
+    mov ah, 06h
+    mov ch, 0 ; row start
+    mov cl, 1 ; col start
+    mov dh, 24  ; row end
+    mov dl, 78  ; col end
+    mov bh, 2Eh ; green and yellow
+    int 10h   
+    RET
+COLOR_SCREEN ENDP
+
 PUT_NEWLINE PROC
     LEA DX, newline
     CALL DISPLAY_STRING
     RET
 PUT_NEWLINE ENDP
 
+WAIT_USER_INPUT PROC
+    ; Wait for user input
+    MOV AH, 01H
+    INT 21H
+    RET
+WAIT_USER_INPUT ENDP
+
 ; account register functions
 ; this one is called when the program starts
 REGISTER_ACC1 PROC          
+
+    CALL PUT_NEWLINE
 
     LEA DX, register_header
     CALL DISPLAY_STRING
@@ -704,6 +719,9 @@ REGISTER_ACC1 PROC
 REGISTER_ACC1 ENDP
 
 REGISTER_ACC2 PROC
+
+    CALL PUT_NEWLINE
+
     LEA DX, register_header
     CALL DISPLAY_STRING
 
@@ -712,9 +730,6 @@ REGISTER_ACC2 PROC
 
     LEA DX, username2
     CALL READ_STRING
-
-    LEA DX, newline
-    CALL DISPLAY_STRING
 
     LEA DX, enter_password
     CALL DISPLAY_STRING
@@ -738,6 +753,9 @@ REGISTER_ACC2 PROC
 REGISTER_ACC2 ENDP
 
 REGISTER_ACC3 PROC
+
+    CALL PUT_NEWLINE
+
     LEA DX, register_header
     CALL DISPLAY_STRING
 
@@ -746,9 +764,6 @@ REGISTER_ACC3 PROC
 
     LEA DX, username3
     CALL READ_STRING
-
-    LEA DX, newline
-    CALL DISPLAY_STRING
 
     LEA DX, enter_password
     CALL DISPLAY_STRING
@@ -772,6 +787,9 @@ REGISTER_ACC3 PROC
 REGISTER_ACC3 ENDP
 
 LOGIN_ACC PROC
+
+    CALL PUT_NEWLINE
+
     LEA DX, login_header
     CALL DISPLAY_STRING
 
@@ -780,9 +798,6 @@ LOGIN_ACC PROC
 
     LEA DX, login_username_input
     CALL READ_STRING
-
-    LEA DX, newline
-    CALL DISPLAY_STRING
 
     LEA DX, enter_password
     CALL DISPLAY_STRING
@@ -1012,6 +1027,8 @@ INPUT_order_ice_creamCC1 PROC
     
     MOV AX, sum1
     CALL DISPLAY_NUM2
+
+    CALL WAIT_USER_INPUT
     
     RET
 INPUT_order_ice_creamCC1 ENDP
@@ -1095,6 +1112,8 @@ INPUT_order_ice_creamCC2 PROC
     
     MOV AX, sum2
     CALL DISPLAY_NUM2
+
+    CALL WAIT_USER_INPUT
     
     RET
 INPUT_order_ice_creamCC2 ENDP
@@ -1178,6 +1197,8 @@ INPUT_order_ice_creamCC3 PROC
     
     MOV AX, sum3 
     CALL DISPLAY_NUM2
+
+    CALL WAIT_USER_INPUT
     
     RET
 INPUT_order_ice_creamCC3 ENDP
@@ -1393,6 +1414,8 @@ REVIEW_order_ice_creamCC1 PROC
     
     MOV AX, sum1
     CALL DISPLAY_NUM2
+
+    CALL WAIT_USER_INPUT
     
     RET
 REVIEW_order_ice_creamCC1 ENDP
@@ -1466,6 +1489,8 @@ REVIEW_order_ice_creamCC2 PROC
     
     MOV AX, sum2
     CALL DISPLAY_NUM2
+
+    CALL WAIT_USER_INPUT
     
     RET
 REVIEW_order_ice_creamCC2 ENDP
@@ -1539,15 +1564,17 @@ REVIEW_order_ice_creamCC3 PROC
     
     MOV AX, sum3
     CALL DISPLAY_NUM2
+
+    CALL WAIT_USER_INPUT
     
     RET
 REVIEW_order_ice_creamCC3 ENDP
 
 DISPLAY_ACC PROC
+
+    CALL COLOR_SCREEN
     LEA DX, space
     CALL DISPLAY_STRING
-
-    CALL DEF_COLOR
 
     LEA DX, landing_header
     CALL DISPLAY_STRING
@@ -1561,8 +1588,6 @@ DISPLAY_ACC PROC
     LEA DX, space
     CALL DISPLAY_STRING
 
-    CALL DEF_COLOR
-
     LEA DX, landing_login
     CALL DISPLAY_STRING
 
@@ -1575,8 +1600,6 @@ DISPLAY_ACC PROC
     LEA DX, space
     CALL DISPLAY_STRING
 
-    CALL DEF_COLOR
-
     LEA DX, landing_register
     CALL DISPLAY_STRING
 
@@ -1588,8 +1611,6 @@ DISPLAY_ACC PROC
 
     LEA DX, space
     CALL DISPLAY_STRING
-
-    CALL DEF_COLOR
 
     LEA DX, landing_exit
     CALL DISPLAY_STRING
