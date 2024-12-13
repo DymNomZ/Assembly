@@ -12,3 +12,8 @@ mov cx, 0FH
 mov dx, 4240H
 mov ah, 86H
 int 15h
+
+CODE TO CHANGE VIEW/FONT
+mov ax, 1112h
+xor bl, bl
+int 10h
